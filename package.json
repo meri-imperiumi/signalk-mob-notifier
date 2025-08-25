@@ -1,7 +1,7 @@
 {
   "name": "@meri-imperiumi/signalk-mob-notifier",
   "version": "1.0.1",
-  "description": "Create Signal K notifications for discovered AIS MOB and SART beacons",
+  "description": "Create Signal K notifications for discovered AIS MOB, EPIRB, and SART beacons",
   "main": "plugin/index.js",
   "scripts": {
     "test": "eslint ."

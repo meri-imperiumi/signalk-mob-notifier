@@ -38,7 +38,7 @@ module.exports = (app) => {
   const notified = [];
   plugin.id = 'signalk-mob-notifier';
   plugin.name = 'MOB Beacon Notifier';
-  plugin.description = 'Create notifications for discovered AIS MOB and SART beacons';
+  plugin.description = 'Create notifications for discovered AIS MOB, EPIRB, and SART beacons';
 
   plugin.start = (settings) => {
     interval = setInterval(() => {
@@ -156,7 +156,7 @@ module.exports = (app) => {
       interval: {
         type: 'integer',
         default: 5,
-        title: 'How often to check for MOB Beacons (in seconds)?',
+        title: 'How often to check for Beacons (in seconds)?',
       },
     },
   };
