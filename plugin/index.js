@@ -87,8 +87,9 @@ module.exports = (app) => {
           notified.splice(notified.indexOf(mmsi), 1);
         });
 
+      app.setPluginStatus(`${mobs.length} MOB or SART beacons detected`);
+
       if (mobs.length === 0) {
-        // TODO: Clear notifications
         return;
       }
       mobs.forEach((mmsi) => {
