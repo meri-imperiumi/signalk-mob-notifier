@@ -67,7 +67,7 @@ module.exports = (app) => {
           return true;
         })
         .forEach((mmsi) => {
-          app.handleMessage('signalk-meshtastic', {
+          app.handleMessage('signalk-mob-notifier', {
             context: `vessels.${app.selfId}`,
             updates: [
               {
@@ -109,7 +109,7 @@ module.exports = (app) => {
         }
 
         // Raise notification
-        app.handleMessage('signalk-meshtastic', {
+        app.handleMessage('signalk-mob-notifier', {
           context: `vessels.${app.selfId}`,
           updates: [
             {
