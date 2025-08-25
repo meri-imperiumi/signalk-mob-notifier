@@ -38,7 +38,7 @@ module.exports = (app) => {
   const notified = [];
   plugin.id = 'signalk-mob-notifier';
   plugin.name = 'MOB Beacon Notifier';
-  plugin.description = 'Create notifications for discovered AIS MOB beacons';
+  plugin.description = 'Create notifications for discovered AIS MOB and SART beacons';
 
   plugin.start = (settings) => {
     interval = setInterval(() => {
@@ -48,6 +48,10 @@ module.exports = (app) => {
           const mmsi = context.split(':').at(-1);
           if (mmsi.indexOf('972') === 0) {
             // MOB beacon seen!
+            return true;
+          }
+          if (mmsi.indexOf('970') === 0) {
+            // SART beacon seen!
             return true;
           }
           return false;
@@ -89,6 +93,9 @@ module.exports = (app) => {
       }
       mobs.forEach((mmsi) => {
         let message = 'Crew Overboard Beacon detected';
+        if (mmsi.indexOf('970') === 0) {
+          message = 'Search and Rescue Transponder Beacon detected';
+        }
         // For each MOB get direction and range
         const ownPosition = app.getSelfPath('navigation.position');
         const mobPosition = app.getPath(`vessels.urn:mrn:imo:mmsi:${mmsi}.navigation.position`);
