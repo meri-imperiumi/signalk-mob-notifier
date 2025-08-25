@@ -43,7 +43,7 @@ module.exports = (app) => {
   plugin.start = (settings) => {
     interval = setInterval(() => {
       // Check context for MOBs
-      const mobs = Object.keys(app.signalk.vessels)
+      const mobs = Object.keys(app.signalk.root.vessels)
         .filter((context) => {
           const mmsi = context.split(':').at(-1);
           if (mmsi.indexOf('972') === 0) {
