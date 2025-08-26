@@ -91,7 +91,7 @@ module.exports = (app) => {
           notified.splice(notified.indexOf(mmsi), 1);
         });
 
-      app.setPluginStatus(`${mobs.length} MOB or SART beacons detected`);
+      app.setPluginStatus(`${mobs.length} MOB, EPIRB, or SART beacons detected`);
 
       if (mobs.length === 0) {
         return;
