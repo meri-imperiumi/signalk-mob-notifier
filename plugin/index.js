@@ -155,7 +155,7 @@ module.exports = (app) => {
     properties: {
       interval: {
         type: 'integer',
-        default: 5,
+        default: 30,
         title: 'How often to check for Beacons (in seconds)?',
       },
     },
