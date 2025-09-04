@@ -8,3 +8,10 @@ This plugin detects if Signal K has seen an AIS MOB (MMSI starting with `972`), 
 * Visual with apps like Freeboard
 
 Please note that this plugin aims to aid with noticing and locating crew overboard. It is not a replacement for "proper" alerting mechanisms via dedicated alert buzzers, chartplotters, or a VHF radio.
+
+## Changes
+
+* 1.1.0 (2025-09-04)
+  - Notification is not re-published if it already exists
+* 1.0.0 (2025-08-25)
+  - Initial release
