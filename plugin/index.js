@@ -97,6 +97,11 @@ module.exports = (app) => {
         return;
       }
       mobs.forEach((mmsi) => {
+        // Check if we already have a notification for this one
+        const notification = app.getSelfPath(`notifications.mob.${mmsi}`);
+        if (notification) {
+          return;
+        }
         let message = 'Crew Overboard Beacon detected';
         if (mmsi.indexOf('970') === 0) {
           message = 'Search and Rescue Transponder Beacon detected';
