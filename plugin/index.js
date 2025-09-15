@@ -112,9 +112,9 @@ module.exports = (app) => {
         // For each MOB get direction and range
         const ownPosition = app.getSelfPath('navigation.position');
         const mobPosition = app.getPath(`vessels.urn:mrn:imo:mmsi:${mmsi}.navigation.position`);
-        if (ownPosition && mobPosition) {
-          const me = new Point(ownPosition.latitude, ownPosition.longitude);
-          const they = new Point(mobPosition.latitude, mobPosition.longitude);
+        if (ownPosition && ownPosition.value && mobPosition && mobPosition.value) {
+          const me = new Point(ownPosition.value.latitude, ownPosition.value.longitude);
+          const they = new Point(mobPosition.value.latitude, mobPosition.value.longitude);
           const distance = me.distanceTo(they, 'K') * 1000; // In meters
           const direction = longDirection(me.directionTo(they));
           message = `${message} ${distance} meters to ${direction}`;
