@@ -134,6 +134,10 @@ module.exports = (app) => {
                   path: `notifications.mob.${mmsi}`,
                   value: {
                     message,
+                    data: {
+                      mmsi,
+                      position: mobPosition,
+                    },
                     state: 'emergency',
                     method: ['visual', 'sound'],
                   },
