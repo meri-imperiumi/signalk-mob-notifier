@@ -11,6 +11,8 @@ Please note that this plugin aims to aid with noticing and locating crew overboa
 
 ## Changes
 
+* 1.1.1 (2025-09-18)
+  - Notifications include position when available
 * 1.1.0 (2025-09-04)
   - Notification is not re-published if it already exists
 * 1.0.0 (2025-08-25)
