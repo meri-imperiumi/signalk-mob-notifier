@@ -110,11 +110,27 @@ module.exports = (app) => {
           message = 'Emergency Position Indicating Beacon detected';
         }
         // For each MOB get direction and range
-        const ownPosition = app.getSelfPath('navigation.position');
-        const mobPosition = app.getPath(`vessels.urn:mrn:imo:mmsi:${mmsi}.navigation.position`);
-        if (ownPosition && ownPosition.value && mobPosition && mobPosition.value) {
-          const me = new Point(ownPosition.value.latitude, ownPosition.value.longitude);
-          const they = new Point(mobPosition.value.latitude, mobPosition.value.longitude);
+        const getCoordinates = (v) => {
+          if (Number.isFinite(v.latitude)) {
+            return v;
+          }
+          if (v.value && Number.isFinite(v.value.latitude)) {
+            return v.value;
+          }
+          return {};
+        };
+        const ownPosition = getCoordinates(app.getSelfPath('navigation.position'));
+        const mob = app.getPath(`vessels.urn:mrn:imo:mmsi:${mmsi}`);
+        let mobPosition = {};
+        if (mob.navigation && mob.navigation.position) {
+          mobPosition = getCoordinates(mob.navigation.position);
+        }
+        if (ownPosition
+          && Number.isFinite(ownPosition.latitude)
+          && mobPosition
+          && Number.isFinite(mobPosition.latitude)) {
+          const me = new Point(ownPosition.latitude, ownPosition.longitude);
+          const they = new Point(mobPosition.latitude, mobPosition.longitude);
           const distance = me.distanceTo(they, 'K') * 1000; // In meters
           const direction = longDirection(me.directionTo(they));
           message = `${message} ${distance} meters to ${direction}`;
@@ -134,7 +150,7 @@ module.exports = (app) => {
                   path: `notifications.mob.${mmsi}`,
                   value: {
                     message,
-                    position: mobPosition ? mobPosition.value : null,
+                    position: mobPosition || null,
                     data: {
                       mmsi,
                     },
