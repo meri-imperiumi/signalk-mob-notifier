@@ -11,6 +11,8 @@ Please note that this plugin aims to aid with noticing and locating crew overboa
 
 ## Changes
 
+* 1.1.2 (2025-11-01)
+  - Better approach at getting MOB coordinates
 * 1.1.1 (2025-09-18)
   - Notifications include position when available
 * 1.1.0 (2025-09-04)
