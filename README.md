@@ -11,6 +11,8 @@ Please note that this plugin aims to aid with noticing and locating crew overboa
 
 ## Changes
 
+* 1.1.3 (2025-11-02)
+  - Fix detection of beacon type (MOB/SART/EPIRB)
 * 1.1.2 (2025-11-01)
   - Better approach at getting MOB coordinates
 * 1.1.1 (2025-09-18)
