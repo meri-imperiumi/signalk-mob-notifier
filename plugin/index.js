@@ -44,8 +44,8 @@ module.exports = (app) => {
     interval = setInterval(() => {
       // Check context for MOBs
       const mobs = Object.keys(app.signalk.root.vessels)
-        .filter((context) => {
-          const mmsi = context.split(':').at(-1);
+        .map((ctx) => ctx.split(':').at(-1))
+        .filter((mmsi) => {
           if (mmsi.indexOf('972') === 0) {
             // MOB beacon seen!
             return true;
@@ -120,9 +120,10 @@ module.exports = (app) => {
           return {};
         };
         const ownPosition = getCoordinates(app.getSelfPath('navigation.position'));
-        const mob = app.getPath(`vessels.urn:mrn:imo:mmsi:${mmsi}`);
+        const mobContext = `urn:mrn:imo:mmsi:${mmsi}`;
+        const mob = app.signalk.root.vessels[mobContext];
         let mobPosition = {};
-        if (mob.navigation && mob.navigation.position) {
+        if (mob && mob.navigation && mob.navigation.position) {
           mobPosition = getCoordinates(mob.navigation.position);
         }
         if (ownPosition
