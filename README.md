@@ -11,6 +11,8 @@ Please note that this plugin aims to aid with noticing and locating crew overboa
 
 ## Changes
 
+* 1.1.5 (2025-11-15)
+  - Bump release
 * 1.1.4 (2025-11-12)
   - Fix reading MOB vessel data structure
 * 1.1.3 (2025-11-02)
