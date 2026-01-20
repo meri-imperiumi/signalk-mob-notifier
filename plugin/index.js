@@ -132,7 +132,7 @@ module.exports = (app) => {
           && Number.isFinite(mobPosition.latitude)) {
           const me = new Point(ownPosition.latitude, ownPosition.longitude);
           const they = new Point(mobPosition.latitude, mobPosition.longitude);
-          const distance = me.distanceTo(they, 'K') * 1000; // In meters
+          const distance = (me.distanceTo(they, 'K') * 1000).toFixed(1); // In meters
           const direction = longDirection(me.directionTo(they));
           message = `${message} ${distance} meters to ${direction}`;
         }
