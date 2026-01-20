@@ -11,6 +11,9 @@ Please note that this plugin aims to aid with noticing and locating crew overboa
 
 ## Changes
 
+* 1.1.6 (2026-01-20)
+  - Round distance to beacon with single decimal
+  - Use EPIRB and SART terms for shorter notifications
 * 1.1.5 (2025-11-15)
   - Bump release
 * 1.1.4 (2025-11-12)
