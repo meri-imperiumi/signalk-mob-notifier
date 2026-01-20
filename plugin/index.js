@@ -104,10 +104,10 @@ module.exports = (app) => {
         }
         let message = 'Crew Overboard Beacon detected';
         if (String(mmsi).indexOf('970') === 0) {
-          message = 'Search and Rescue Transponder Beacon detected';
+          message = 'SART beacon detected';
         }
         if (String(mmsi).indexOf('974') === 0) {
-          message = 'Emergency Position Indicating Beacon detected';
+          message = 'EPIRB detected';
         }
         // For each MOB get direction and range
         const getCoordinates = (v) => {
