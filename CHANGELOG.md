@@ -1,4 +1,4 @@
-* 1.1.6 (git main)
+* 1.1.7 (2026-06-16)
   - Added application icon
 * 1.1.6 (2026-01-20)
   - Round distance to beacon with single decimal
