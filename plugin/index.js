@@ -165,7 +165,7 @@ module.exports = (app) => {
         });
         notified.push(mmsi);
       });
-    }, settings.interval * 1000);
+    }, settings.interval ? settings.interval * 1000 : 30000);
   };
 
   plugin.stop = () => {
