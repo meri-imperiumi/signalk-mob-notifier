@@ -11,4 +11,4 @@ Please note that this plugin aims to aid with noticing and locating crew overboa
 
 ## Changes
 
-See <CHANGELOG.md>
+See [Changelog](CHANGELOG.md)
