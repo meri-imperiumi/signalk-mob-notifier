@@ -35,7 +35,7 @@
   },
   "signalk-plugin-enabled-by-default": true,
   "signalk": {
-    "appIcon": "./doc/appicon.png",
+    "appIcon": "./doc/appicon-256.png",
     "displayName": "AIS MOB and EPIRB notifier",
     "screenshots": [
       "./doc/alert.png"
