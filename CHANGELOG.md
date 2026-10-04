@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [1.1.8] - 2026-10-05
 ### Changed
 - Bump the `where` dependency to `^0.4.3`, which normalizes its bearing/direction longitude delta across the antimeridian (the upstream fix). The MOB message's distance and direction were already seam-safe — the haversine and bearing trig folds the seam — so this is a stay-current bump, pinning the upstream antimeridian-hardened version
 
