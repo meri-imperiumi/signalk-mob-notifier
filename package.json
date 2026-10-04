@@ -31,7 +31,7 @@
     "eslint-plugin-import": "^2.32.0"
   },
   "dependencies": {
-    "where": "^0.4.2"
+    "where": "^0.4.3"
   },
   "signalk-plugin-enabled-by-default": true,
   "signalk": {
