@@ -4,7 +4,8 @@
   "description": "Create Signal K notifications for discovered AIS MOB, EPIRB, and SART beacons",
   "main": "plugin/index.js",
   "scripts": {
-    "pretest": "eslint .",
+    "lint": "npx @biomejs/biome check --use-editorconfig=true plugin/",
+    "format": "npx @biomejs/biome check --use-editorconfig=true --write plugin/ test/",
     "test": "node --test"
   },
   "repository": {
@@ -25,11 +26,6 @@
     "access": "public"
   },
   "homepage": "https://github.com/meri-imperiumi/signalk-mob-notifier#readme",
-  "devDependencies": {
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.32.0"
-  },
   "dependencies": {
     "where": "^1.0.0"
   },

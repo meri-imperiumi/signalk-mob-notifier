@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+### Changed
+- Switched linting and formatting from ESLint (airbnb-base) to Biome, driven by the existing `.editorconfig` via new `lint` and `format` npm scripts. The project remains CommonJS
 
 ## [1.1.8] - 2026-10-05
 ### Changed

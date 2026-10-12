@@ -1,26 +1,26 @@
-const { describe, it } = require('node:test');
-const assert = require('node:assert/strict');
+const { describe, it } = require("node:test");
+const assert = require("node:assert/strict");
 
-const pluginFactory = require('../plugin/index');
+const pluginFactory = require("../plugin/index");
 
-describe('plugin', () => {
+describe("plugin", () => {
   const app = { debug: () => {}, error: () => {} };
   const plugin = pluginFactory(app);
 
-  it('has required interface', () => {
-    assert.equal(typeof plugin.start, 'function');
-    assert.equal(typeof plugin.stop, 'function');
+  it("has required interface", () => {
+    assert.equal(typeof plugin.start, "function");
+    assert.equal(typeof plugin.stop, "function");
     assert.ok(plugin.id);
   });
 
-  it('starts and stops without error', () => {
+  it("starts and stops without error", () => {
     plugin.start({}, () => {});
     plugin.stop();
   });
 });
 
-describe('MOB message across the antimeridian', () => {
-  it('reports the short-way distance and direction across 180°', () => {
+describe("MOB message across the antimeridian", () => {
+  it("reports the short-way distance and direction across 180°", () => {
     // Vessel just east of the antimeridian, MOB beacon just west of it:
     // the beacon is ~22 km east (over the seam), not half a world away.
     const messages = [];
@@ -29,9 +29,9 @@ describe('MOB message across the antimeridian', () => {
     const app = {
       debug: () => {},
       error: () => {},
-      selfId: 'urn:mrn:imo:mmsi:230099999',
+      selfId: "urn:mrn:imo:mmsi:230099999",
       getSelfPath: (path) => {
-        if (path === 'navigation.position') {
+        if (path === "navigation.position") {
           return { latitude: -14, longitude: 179.9 };
         }
         // The plugin dedups against the live notification subtree
@@ -40,7 +40,7 @@ describe('MOB message across the antimeridian', () => {
       signalk: {
         root: {
           vessels: {
-            'urn:mrn:imo:mmsi:972123456': {
+            "urn:mrn:imo:mmsi:972123456": {
               navigation: {
                 position: { value: { latitude: -14, longitude: -179.9 } },
               },
@@ -49,13 +49,15 @@ describe('MOB message across the antimeridian', () => {
         },
       },
       setPluginStatus: (s) => statuses.push(s),
-      handleMessage: (source, delta) => {
+      handleMessage: (_source, delta) => {
         messages.push(delta);
-        delta.updates.forEach((u) => u.values.forEach((v) => {
-          if (v.path.startsWith('notifications.mob.') && v.value) {
-            raised[v.path] = v.value;
-          }
-        }));
+        delta.updates.forEach((u) => {
+          u.values.forEach((v) => {
+            if (v.path.startsWith("notifications.mob.") && v.value) {
+              raised[v.path] = v.value;
+            }
+          });
+        });
       },
     };
     const plugin = pluginFactory(app);
@@ -66,8 +68,8 @@ describe('MOB message across the antimeridian', () => {
         const notifications = messages
           .flatMap((d) => d.updates)
           .flatMap((u) => u.values)
-          .filter((v) => v.path.startsWith('notifications.mob.'));
-        assert.equal(notifications.length, 1, 'one MOB notification raised');
+          .filter((v) => v.path.startsWith("notifications.mob."));
+        assert.equal(notifications.length, 1, "one MOB notification raised");
         const { message } = notifications[0].value;
         const meters = Number(message.match(/([\d.]+) meters/)[1]);
         assert.ok(

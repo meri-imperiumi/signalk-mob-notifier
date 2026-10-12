@@ -1,33 +1,33 @@
-const { Point } = require('where');
+const { Point } = require("where");
 
 function longDirection(direction) {
   switch (direction) {
-    case 'N': {
-      return 'north';
+    case "N": {
+      return "north";
     }
-    case 'NE': {
-      return 'northeast';
+    case "NE": {
+      return "northeast";
     }
-    case 'E': {
-      return 'east';
+    case "E": {
+      return "east";
     }
-    case 'SE': {
-      return 'southeast';
+    case "SE": {
+      return "southeast";
     }
-    case 'S': {
-      return 'south';
+    case "S": {
+      return "south";
     }
-    case 'SW': {
-      return 'southwest';
+    case "SW": {
+      return "southwest";
     }
-    case 'W': {
-      return 'west';
+    case "W": {
+      return "west";
     }
-    case 'NW': {
-      return 'northwest';
+    case "NW": {
+      return "northwest";
     }
     default: {
-      return 'unknown';
+      return "unknown";
     }
   }
 }
@@ -36,136 +36,146 @@ module.exports = (app) => {
   const plugin = {};
   let interval;
   const notified = [];
-  plugin.id = 'signalk-mob-notifier';
-  plugin.name = 'MOB Beacon Notifier';
-  plugin.description = 'Create notifications for discovered AIS MOB, EPIRB, and SART beacons';
+  plugin.id = "signalk-mob-notifier";
+  plugin.name = "MOB Beacon Notifier";
+  plugin.description =
+    "Create notifications for discovered AIS MOB, EPIRB, and SART beacons";
 
   plugin.start = (settings) => {
-    interval = setInterval(() => {
-      // Check context for MOBs
-      const mobs = Object.keys(app.signalk.root.vessels)
-        .map((ctx) => ctx.split(':').at(-1))
-        .filter((mmsi) => {
-          if (mmsi.indexOf('972') === 0) {
-            // MOB beacon seen!
-            return true;
-          }
-          if (mmsi.indexOf('970') === 0) {
-            // SART beacon seen!
-            return true;
-          }
-          if (mmsi.indexOf('974') === 0) {
-            // EPIRB seen!
-            return true;
-          }
-          return false;
-        });
-
-      // Clear notifications as needed
-      notified
-        .filter((mmsi) => {
-          if (mobs.indexOf(mmsi) !== -1) {
-            // This beacon is still active
+    interval = setInterval(
+      () => {
+        // Check context for MOBs
+        const mobs = Object.keys(app.signalk.root.vessels)
+          .map((ctx) => ctx.split(":").at(-1))
+          .filter((mmsi) => {
+            if (mmsi.indexOf("972") === 0) {
+              // MOB beacon seen!
+              return true;
+            }
+            if (mmsi.indexOf("970") === 0) {
+              // SART beacon seen!
+              return true;
+            }
+            if (mmsi.indexOf("974") === 0) {
+              // EPIRB seen!
+              return true;
+            }
             return false;
+          });
+
+        // Clear notifications as needed
+        notified
+          .filter((mmsi) => {
+            if (mobs.indexOf(mmsi) !== -1) {
+              // This beacon is still active
+              return false;
+            }
+            return true;
+          })
+          .forEach((mmsi) => {
+            app.handleMessage("signalk-mob-notifier", {
+              context: `vessels.${app.selfId}`,
+              updates: [
+                {
+                  source: {
+                    label: plugin.id,
+                  },
+                  timestamp: new Date().toISOString(),
+                  values: [
+                    {
+                      path: `notifications.mob.${mmsi}`,
+                      value: null,
+                    },
+                  ],
+                },
+              ],
+            });
+            notified.splice(notified.indexOf(mmsi), 1);
+          });
+
+        app.setPluginStatus(
+          `${mobs.length} MOB, EPIRB, or SART beacons detected`,
+        );
+
+        if (mobs.length === 0) {
+          return;
+        }
+        mobs.forEach((mmsi) => {
+          // Check if we already have a notification for this one
+          const notification = app.getSelfPath(`notifications.mob.${mmsi}`);
+          if (notification) {
+            return;
           }
-          return true;
-        })
-        .forEach((mmsi) => {
-          app.handleMessage('signalk-mob-notifier', {
+          let message = "Crew Overboard Beacon detected";
+          if (String(mmsi).indexOf("970") === 0) {
+            message = "SART beacon detected";
+          }
+          if (String(mmsi).indexOf("974") === 0) {
+            message = "EPIRB detected";
+          }
+          // For each MOB get direction and range
+          const getCoordinates = (v) => {
+            if (Number.isFinite(v.latitude)) {
+              return v;
+            }
+            if (v.value && Number.isFinite(v.value.latitude)) {
+              return v.value;
+            }
+            return {};
+          };
+          const ownPosition = getCoordinates(
+            app.getSelfPath("navigation.position"),
+          );
+          const mobContext = `urn:mrn:imo:mmsi:${mmsi}`;
+          const mob = app.signalk.root.vessels[mobContext];
+          let mobPosition = {};
+          if (mob?.navigation?.position) {
+            mobPosition = getCoordinates(mob.navigation.position);
+          }
+          if (
+            ownPosition &&
+            Number.isFinite(ownPosition.latitude) &&
+            mobPosition &&
+            Number.isFinite(mobPosition.latitude)
+          ) {
+            const me = new Point(ownPosition.latitude, ownPosition.longitude);
+            const they = new Point(mobPosition.latitude, mobPosition.longitude);
+            const distance = (me.distanceTo(they, "K") * 1000).toFixed(1); // In meters
+            const direction = longDirection(me.directionTo(they));
+            message = `${message} ${distance} meters to ${direction}`;
+          }
+
+          // Raise notification
+          app.handleMessage("signalk-mob-notifier", {
             context: `vessels.${app.selfId}`,
             updates: [
               {
                 source: {
                   label: plugin.id,
                 },
-                timestamp: (new Date().toISOString()),
+                timestamp: new Date().toISOString(),
                 values: [
                   {
                     path: `notifications.mob.${mmsi}`,
-                    value: null,
+                    value: {
+                      message,
+                      position: mobPosition || null,
+                      data: {
+                        mmsi,
+                      },
+                      state: "emergency",
+                      method: ["visual", "sound"],
+                    },
                   },
                 ],
               },
             ],
           });
-          notified.splice(notified.indexOf(mmsi), 1);
+          notified.push(mmsi);
         });
-
-      app.setPluginStatus(`${mobs.length} MOB, EPIRB, or SART beacons detected`);
-
-      if (mobs.length === 0) {
-        return;
-      }
-      mobs.forEach((mmsi) => {
-        // Check if we already have a notification for this one
-        const notification = app.getSelfPath(`notifications.mob.${mmsi}`);
-        if (notification) {
-          return;
-        }
-        let message = 'Crew Overboard Beacon detected';
-        if (String(mmsi).indexOf('970') === 0) {
-          message = 'SART beacon detected';
-        }
-        if (String(mmsi).indexOf('974') === 0) {
-          message = 'EPIRB detected';
-        }
-        // For each MOB get direction and range
-        const getCoordinates = (v) => {
-          if (Number.isFinite(v.latitude)) {
-            return v;
-          }
-          if (v.value && Number.isFinite(v.value.latitude)) {
-            return v.value;
-          }
-          return {};
-        };
-        const ownPosition = getCoordinates(app.getSelfPath('navigation.position'));
-        const mobContext = `urn:mrn:imo:mmsi:${mmsi}`;
-        const mob = app.signalk.root.vessels[mobContext];
-        let mobPosition = {};
-        if (mob && mob.navigation && mob.navigation.position) {
-          mobPosition = getCoordinates(mob.navigation.position);
-        }
-        if (ownPosition
-          && Number.isFinite(ownPosition.latitude)
-          && mobPosition
-          && Number.isFinite(mobPosition.latitude)) {
-          const me = new Point(ownPosition.latitude, ownPosition.longitude);
-          const they = new Point(mobPosition.latitude, mobPosition.longitude);
-          const distance = (me.distanceTo(they, 'K') * 1000).toFixed(1); // In meters
-          const direction = longDirection(me.directionTo(they));
-          message = `${message} ${distance} meters to ${direction}`;
-        }
-
-        // Raise notification
-        app.handleMessage('signalk-mob-notifier', {
-          context: `vessels.${app.selfId}`,
-          updates: [
-            {
-              source: {
-                label: plugin.id,
-              },
-              timestamp: (new Date().toISOString()),
-              values: [
-                {
-                  path: `notifications.mob.${mmsi}`,
-                  value: {
-                    message,
-                    position: mobPosition || null,
-                    data: {
-                      mmsi,
-                    },
-                    state: 'emergency',
-                    method: ['visual', 'sound'],
-                  },
-                },
-              ],
-            },
-          ],
-        });
-        notified.push(mmsi);
-      });
-    }, settings.interval ? settings.interval * 1000 : 30000);
+      },
+      settings.interval ? settings.interval * 1000 : 30000,
+    );
   };
 
   plugin.stop = () => {
@@ -177,12 +187,12 @@ module.exports = (app) => {
   };
 
   plugin.schema = {
-    type: 'object',
+    type: "object",
     properties: {
       interval: {
-        type: 'integer',
+        type: "integer",
         default: 30,
-        title: 'How often to check for Beacons (in seconds)?',
+        title: "How often to check for Beacons (in seconds)?",
       },
     },
   };
